@@ -249,16 +249,16 @@
                 <span class="detail-label">Rate</span>
                 <span class="detail-value">
                     {% if booking.booking_type == 'hourly' %}
-                        ₹{{ booking.room.hourly_rate }}/hour
+                        ৳{{ booking.room.hourly_rate }}/hour
                     {% else %}
-                        ₹{{ booking.room.daily_rate }}/day
+                        ৳{{ booking.room.daily_rate }}/day
                     {% endif %}
                 </span>
             </div>
             <div class="detail-item" style="padding-top: 1rem; border-top: 2px solid #f0f0f0; margin-top: 1rem;">
                 <span class="detail-label" style="font-size: 1.1rem;">Total Amount</span>
                 <span class="detail-value" style="font-size: 1.3rem; font-weight: bold; color: #667eea;">
-                    ₹{{ booking.total_price }}
+                    ৳{{ booking.total_price }}
                 </span>
             </div>
         </div>

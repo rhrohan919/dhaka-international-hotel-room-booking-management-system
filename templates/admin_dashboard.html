@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Hotel Booking{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-shell { max-width: 1200px; margin: 0 auto; }
+    .admin-header {
+        background: white; border-radius: 18px; padding: 2rem; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        margin-bottom: 2rem;
+    }
+    .admin-header h1 { margin: 0 0 0.4rem 0; color: #0f172a; }
+    .admin-header p { margin: 0; color: #475569; }
+    .stats-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;
+    }
+    .stat-card {
+        background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+    .stat-card .icon { font-size: 2.3rem; margin-bottom: 0.8rem; }
+    .stat-card .number { font-size: 2.2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.2rem; }
+    .stat-card .label { color: #475569; text-transform: uppercase; letter-spacing: 0.08rem; font-size: 0.75rem; }
+    .panel {
+        background: white; border-radius: 18px; padding: 1.5rem; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+    .panel h2 { margin-top: 0; color: #0f172a; }
+    .recent-list { display: flex; flex-direction: column; gap: 1rem; }
+    .recent-item {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 1rem 1.1rem; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0;
+    }
+    .recent-meta strong { display: block; }
+    .recent-meta span { color: #64748b; font-size: 0.9rem; }
+    .booking-status {
+        padding: 0.45rem 0.8rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; text-transform: capitalize;
+    }
+    .status-confirmed { background: #dcfce7; color: #166534; }
+    .status-checked_in { background: #dbeafe; color: #1d4ed8; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-checked_out { background: #e2e8f0; color: #334155; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-shell">
+    <div class="admin-header">
+        <h1>🏨 Staff Admin Dashboard</h1>
+        <p>Monitor hotel performance, room inventory, and live bookings.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="icon">🏠</div>
+            <div class="number">{{ total_rooms }}</div>
+            <div class="label">Total Rooms</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon">✅</div>
+            <div class="number">{{ available_rooms }}</div>
+            <div class="label">Available</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon">🛠️</div>
+            <div class="number">{{ maintenance_rooms }}</div>
+            <div class="label">Maintenance</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon">📋</div>
+            <div class="number">{{ total_bookings }}</div>
+            <div class="label">Bookings</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon">🟢</div>
+            <div class="number">{{ confirmed_bookings }}</div>
+            <div class="label">Confirmed</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon">🔑</div>
+            <div class="number">{{ checked_in_bookings }}</div>
+            <div class="label">Checked In</div>
+        </div>
+        <div class="stat-card">
+            <div class="icon">🚫</div>
+            <div class="number">{{ cancelled_bookings }}</div>
+            <div class="label">Cancelled</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Recent Bookings</h2>
+        {% if recent_bookings %}
+            <div class="recent-list">
+                {% for booking in recent_bookings %}
+                <div class="recent-item">
+                    <div class="recent-meta">
+                        <strong>Room {{ booking.room.room_number }} · {{ booking.user.username }}</strong>
+                        <span>{{ booking.start_time|date:"M d, Y" }} to {{ booking.end_time|date:"M d, Y" }}</span>
+                    </div>
+                    <span class="booking-status status-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No recent bookings yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

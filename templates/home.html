@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+
+{% block title %}Dhaka International Hotel | Premium Stays{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <div class="eyebrow">Luxury stays • seamless booking</div>
+        <h1>Discover a refined <span>Bangladesh hospitality experience</span>.</h1>
+        <p>
+            From executive suites to cozy family rooms, we make every stay feel effortless, comfortable, and memorable.
+            Book premium rooms with flexible pricing and warm service across the city.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{% url 'register' %}" class="btn btn-primary">Create Account</a>
+            <a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
+        </div>
+
+        <div class="inline-stats">
+            <div class="stat-pill">
+                <strong>120+</strong>
+                <span>Premium rooms</span>
+            </div>
+            <div class="stat-pill">
+                <strong>4.9/5</strong>
+                <span>Guest rating</span>
+            </div>
+            <div class="stat-pill">
+                <strong>24/7</strong>
+                <span>Support</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-visual">
+        <div class="visual-card">
+            <div class="room-preview"></div>
+            <div class="visual-meta">
+                <div>
+                    <small style="color: rgba(255,255,255,0.7);">Grand Suite</small>
+                    <strong>City Skyline</strong>
+                </div>
+                <span class="price-tag">From ৳4,500 / night</span>
+            </div>
+        </div>
+
+        <div class="host-card">
+            <small>Happy guests</small>
+            <strong>3,240+</strong>
+        </div>
+    </div>
+</section>
+
+<section id="about" class="section">
+    <div class="section-header">
+        <h2>About Dhaka International Hotel</h2>
+    </div>
+
+    <div class="about-story">
+        <p>
+            Dhaka International Hotel is a modern hospitality destination designed for guests who value comfort, convenience, and exceptional service.
+            We bring together elegant rooms, warm hospitality, and thoughtfully curated experiences to create memorable stays for business travelers,
+            families, and weekend visitors alike.
+        </p>
+        <p>
+            From well-appointed rooms and attentive staff to smooth check-in experiences and dependable support, Dhaka International Hotel is committed to making every stay feel effortless and relaxing.
+            Our goal is simple: provide a refined, welcoming environment where guests can unwind, work, and enjoy a premium hotel experience in Bangladesh.
+        </p>
+    </div>
+
+    <div class="feature-grid">
+        <article class="feature-card">
+            <div class="feature-icon">🏨</div>
+            <h3>Curated comfort</h3>
+            <p>Thoughtfully designed rooms with premium amenities for restful, elevated stays in every season.</p>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Fast booking</h3>
+            <p>Reserve a room in minutes, compare rates instantly, and plan your trip with confidence.</p>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Trusted service</h3>
+            <p>From arrival to checkout, our hospitality team ensures a seamless and stress-free experience.</p>
+        </article>
+    </div>
+</section>
+
+<section id="services" class="section">
+    <div class="section-header">
+        <h2>Everything your stay needs</h2>
+        <p>Comfort, convenience, and premium hospitality.</p>
+    </div>
+
+    <div class="service-grid">
+        <article class="service-card">
+            <div class="service-icon">🧼</div>
+            <h3>Housekeeping</h3>
+            <p>Fresh linens, spotless rooms, and attentive service to keep every stay polished and relaxing.</p>
+        </article>
+
+        <article class="service-card">
+            <div class="service-icon">🍽️</div>
+            <h3>Dining</h3>
+            <p>Enjoy curated in-room dining and flavorful local cuisine designed for a rich guest experience.</p>
+        </article>
+
+        <article class="service-card">
+            <div class="service-icon">🚗</div>
+            <h3>Transport</h3>
+            <p>Airport pickup and local transfers make travel easier from the moment guests arrive.</p>
+        </article>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header">
+        <h2>Featured rooms</h2>
+        <p>Handpicked stays with the best value and comfort.</p>
+    </div>
+
+    <div class="featured-grid">
+        {% for room in featured_rooms %}
+        <article class="room-showcase-card">
+            <div class="room-showcase-image">🏨</div>
+            <div class="room-showcase-content">
+                <div class="room-header-row">
+                    <span class="room-label">{{ room.get_room_type_display }}</span>
+                    <span class="room-number-badge">Room {{ room.room_number }}</span>
+                </div>
+                <h3>{{ room.get_room_type_display }} Suite</h3>
+                <p>{{ room.description|default:"Comfortable stay with premium furnishings and modern amenities for a peaceful experience." }}</p>
+
+                <div class="room-meta-row">
+                    <span>👥 {{ room.capacity }} Guests</span>
+                    <span>🏢 Floor {{ room.floor|default:"G" }}</span>
+                </div>
+
+                <div class="room-pricing-row">
+                    <div>
+                        <small>Hourly</small>
+                        <strong>৳{{ room.hourly_rate }}</strong>
+                    </div>
+                    <div>
+                        <small>Daily</small>
+                        <strong>৳{{ room.daily_rate }}</strong>
+                    </div>
+                </div>
+
+                <a href="{% url 'rooms' %}" class="btn btn-primary room-btn">View Details</a>
+            </div>
+        </article>
+        {% empty %}
+        <article class="room-showcase-card">
+            <div class="room-showcase-image">✨</div>
+            <div class="room-showcase-content">
+                <h3>Luxury room showcase</h3>
+                <p>Discover premium rooms with elegant interiors, serene comfort, and flexible booking options.</p>
+                <a href="{% url 'rooms' %}" class="btn btn-primary room-btn">Browse Rooms</a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header">
+        <h2>Guest reviews</h2>
+        <p>Real moments from happy travelers.</p>
+    </div>
+
+    <div class="review-grid">
+        <article class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p>“The room was spotless, the service was excellent, and the check-in process was incredibly smooth.”</p>
+            <div class="reviewer">
+                <strong>Rafsan A.</strong>
+                <span>Business traveler</span>
+            </div>
+        </article>
+
+        <article class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p>“Great location, thoughtful staff, and a very comfortable stay. The room felt premium in every detail.”</p>
+            <div class="reviewer">
+                <strong>Nusrat S.</strong>
+                <span>Family guest</span>
+            </div>
+        </article>
+
+        <article class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p>“Booking was easy, pricing was fair, and the overall hospitality was warm and professional.”</p>
+            <div class="reviewer">
+                <strong>Imran T.</strong>
+                <span>Weekend traveler</span>
+            </div>
+        </article>
+    </div>
+</section>
+
+<section id="faq" class="section">
+    <div class="section-header">
+        <h2>Frequently asked questions</h2>
+        <p>Everything you need to know before booking.</p>
+    </div>
+
+    <div class="faq-list">
+        <div class="faq-item active">
+            <button class="faq-question" type="button">Can I book a room for a few hours?</button>
+            <div class="faq-answer">
+                <p>Yes. Our hourly booking option is available for short stays, business meetings, and flexible guest needs.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" type="button">Do you allow family stays?</button>
+            <div class="faq-answer">
+                <p>Absolutely. Our rooms support different guest capacities, and larger rooms are available for family bookings.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" type="button">Are extra services available?</button>
+            <div class="faq-answer">
+                <p>Yes. Guests can request housekeeping, dining, transport support, and other special arrangements during booking.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" type="button">How quickly can I get checked in?</button>
+            <div class="faq-answer">
+                <p>Most bookings are confirmed quickly, and our staff works to ensure a smooth check-in process within minutes.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="cta-panel">
+    <div>
+        <h3>Plan your perfect getaway</h3>
+        <p>Book your room today and enjoy a smoother, more premium stay.</p>
+    </div>
+    <a href="{% url 'rooms' %}" class="btn btn-secondary" style="background: white; color: #0f172a;">Browse Rooms</a>
+</div>
+
+<section id="contact" class="section contact-section">
+    <div class="section-header">
+        <h2>Get in touch</h2>
+        <p>Need help with your booking or room choice?</p>
+    </div>
+
+    <div class="contact-panel" style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 2rem; align-items: start;">
+        <div>
+            <div class="contact-badge">📍 Dhaka, Bangladesh</div>
+            <h3>Speak with our hospitality desk</h3>
+            <p>We’re here to help with reservations, room recommendations, and guest support.</p>
+            <div class="contact-meta">
+                <div>📞 +880 1700-000000</div>
+                <div>✉️ dhakainternational@gmail.com</div>
+                <div>🕒 24/7 guest support</div>
+            </div>
+        </div>
+
+        <form method="POST" action="{% url 'contact_message' %}" class="contact-form" style="background: white; border-radius: 18px; padding: 1.5rem; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);">
+            {% csrf_token %}
+            <div class="form-grid" style="display: grid; gap: 1rem;">
+                <div>
+                    <label for="name">Full name</label>
+                    <input id="name" name="name" type="text" placeholder="Your name" required>
+                </div>
+                <div>
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" placeholder="you@example.com" required>
+                </div>
+                <div>
+                    <label for="phone">Phone</label>
+                    <input id="phone" name="phone" type="tel" placeholder="+88017XXXXXXXX" pattern="^(?:\+?88|88)?01[3-9]\d{8}$">
+                </div>
+                <div>
+                    <label for="subject">Subject</label>
+                    <input id="subject" name="subject" type="text" placeholder="Room availability / reservation help" required>
+                </div>
+                <div>
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="4" placeholder="Tell us how we can help..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

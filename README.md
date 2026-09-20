@@ -1,223 +1,171 @@
-# 🏨 Hotel Room Booking System
+# Hotel Room Booking Management System
 
-**Django + Django Rest Framework (DRF)**
+A Django-based hotel reservation application for room search, booking, management, and reporting.
 
----
+## Project overview
 
-## 📌 Project Overview
+This project is designed for a hotel business that needs:
 
-This project is a **Hotel Room Booking System** built using **Django and Django Rest Framework (DRF)**.
+- customer registration and authentication
+- room browsing and filtering
+- booking availability checks with overlapping-date protection
+- secure booking creation and status updates
+- customer dashboards and admin management
+- deployment-ready configuration for local and production environments
 
-The system allows users to:
+## Phase 1 completed
 
-* Search available hotel rooms
-* Book rooms on an **hourly or daily** basis
-* Prevent **overlapping (double) bookings**
-* Perform booking lifecycle actions:
+This phase establishes the core project foundation:
 
-  * Check-in
-  * Check-out
-  * Cancel booking
-* View booking history
+- Django project configuration for safe environment-based settings
+- SQLite by default with optional PostgreSQL configuration
+- static and media folder setup
+- base template and front-end shell
+- login/register flow structure
+- deployment-ready environment examples and dependency file
 
-The project supports:
+## Proposed architecture
 
-* **REST APIs** (for testing via Postman/Thunder Client)
-* **Django Templates UI** (simple web interface)
-
-Both API and UI use the **same backend business logic**.
-
----
-
-## 🧠 Architecture & Design (Important)
-
-### Core Design Principle
-
-> **All business rules are enforced on the backend and reused everywhere.**
-
-### Layers Used
-
-```
-Client (API / Browser)
+```text
+Clients (Browser / API / Admin)
         |
         v
-Views (API views / Template views)
+Django Views + Templates
         |
         v
-Service Layer (BookingService)
+Services / business logic
         |
         v
-Models (Room, Booking)
+Models + ORM
         |
         v
-Database (SQLite)
+SQLite for local dev / PostgreSQL for production
 ```
 
-### Why this architecture?
+## Database relationship diagram
 
-* Prevents duplicate logic
-* Ensures consistency between API and UI
-* Prevents double booking globally
-* Easy to extend (React / Mobile app later)
-* Interview-ready and clean separation of concerns
+```text
+User
+  1 ── 1 CustomerProfile
+  1 ── many Booking
+  1 ── many Payment
+  1 ── many Review
+  1 ── many ContactMessage
 
----
+RoomType
+  1 ── many Room
 
-## 📁 Project Structure
+Room
+  1 ── many RoomImage
+  1 ── many Booking
 
-```
-hotel_booking/
-├── manage.py
-├── hotel_booking/
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-│
-├── rooms/
-│   ├── models.py
-│   ├── serializers.py
-│   ├── views.py
-│   ├── urls.py
-│   ├── admin.py
-│   └── management/
-│       └── commands/
-│           └── populate_rooms.py   # Management command
-│
-├── bookings/
-│   ├── models.py
-│   ├── serializers.py
-│   ├── views.py              # DRF APIs
-│   ├── frontend_views.py     # Template views
-│   ├── frontend_urls.py
-│   ├── services.py           # Business logic
-│   └── admin.py
-│
-├── templates/
-│   ├── base.html
-│   ├── login.html
-│   ├── register.html
-│   ├── dashboard.html
-│   ├── rooms.html
-│   ├── book_room.html
-│   └── my_bookings.html
-│
-└── db.sqlite3
+Booking
+  many ── 1 Room
+  many ── 1 User
+  1 ── many Payment
+
+Payment
+  many ── 1 Booking
 ```
 
----
+## Features in this repo
 
-## ⚙️ Setup Instructions (After Cloning)
+- customer registration and login
+- room list and details pages
+- room availability checks
+- booking creation flow
+- booking status management
+- responsive layout with a premium hotel design
 
-### 1️. Clone the Repository
+## Setup
 
-```bash
-git clone <repository-url>
-cd hotel_booking
-```
-
----
-
-### 2️. Create Virtual Environment
+### 1. Create a virtual environment
 
 ```bash
 python -m venv venv
 ```
 
-Activate it:
-
-**Windows**
+Windows:
 
 ```bash
 venv\Scripts\activate
 ```
 
-**Linux / macOS**
+Linux/macOS:
 
 ```bash
 source venv/bin/activate
 ```
 
----
-
-### 3️. Install Required Packages
-
-Only **Django and DRF** are required:
+### 2. Install dependencies
 
 ```bash
-pip install django djangorestframework
+pip install -r requirements.txt
 ```
 
----
+### 3. Create environment file
 
-### 4️. Run Database Migrations
+Copy the example environment file:
 
 ```bash
-python manage.py makemigrations
+copy .env.example .env
+```
+
+Then update the values in `.env` for your local setup.
+
+### 4. Run migrations
+
+```bash
 python manage.py migrate
 ```
 
----
-
-### 5️. Create Superuser (Admin)
+### 5. Create an admin user
 
 ```bash
 python manage.py createsuperuser
 ```
 
----
-
-### 6️. Populate Sample Room Data (IMPORTANT)
-
-A **custom Django management command** is provided to insert sample room data into the database.
-
-#### Command Details
-
-**File location**
-
-```
-rooms/management/commands/populate_rooms.py
-```
-
-**Run command**
-
-```bash
-python manage.py populate_rooms
-```
-
-👉 This will automatically create sample rooms in `db.sqlite3`.
-
----
-
-### 7️. Run the Server
+### 6. Run the development server
 
 ```bash
 python manage.py runserver
 ```
 
----
+### 7. Load demo data
 
-## 🌐 Application Access
+```bash
+python manage.py populate_rooms
+```
 
-### Web Interface (Templates)
+## Environment variables
 
-| Page        | URL                                                                      |
-| ----------- | ------------------------------------------------------------------------ |
-| Login       | [http://127.0.0.1:8000/](http://127.0.0.1:8000/)                         |
-| Register    | [http://127.0.0.1:8000/register/](http://127.0.0.1:8000/register/)       |
-| Dashboard   | [http://127.0.0.1:8000/dashboard/](http://127.0.0.1:8000/dashboard/)     |
-| Rooms       | [http://127.0.0.1:8000/rooms/](http://127.0.0.1:8000/rooms/)             |
-| My Bookings | [http://127.0.0.1:8000/my-bookings/](http://127.0.0.1:8000/my-bookings/) |
+The project reads the following values from environment variables:
 
----
+- `SECRET_KEY`
+- `DEBUG`
+- `ALLOWED_HOSTS`
+- `DATABASE_URL`
+- `EMAIL_BACKEND`
+- `EMAIL_HOST`
+- `EMAIL_PORT`
+- `EMAIL_USE_TLS`
+- `EMAIL_HOST_USER`
+- `EMAIL_HOST_PASSWORD`
+- `DEFAULT_FROM_EMAIL`
 
-### API Endpoints (DRF)
+## Deployment notes
 
-| Feature                | Method | Endpoint                            |
-| ---------------------- | ------ | ------------------------------------|
-| Search Available Rooms | GET    | `/api/rooms/search-available/`      |
-| Check Availability     | GET    | `/api/bookings/check-availability/` |
-| Create Booking         | POST   | `/api/bookings/`                    |
-| My Bookings            | GET    | `/api/bookings/`                    |
+The settings file supports both SQLite and PostgreSQL. For PostgreSQL, configure `DATABASE_URL` in the environment and deploy with `DEBUG=False` and a safe `ALLOWED_HOSTS` value.
+
+## Next phases
+
+- Phase 2: advanced room management and room details
+- Phase 3: robust booking engine and price validation
+- Phase 4: customer dashboard and invoice flow
+- Phase 5: admin analytics and room management
+- Phase 6: payment, email, and reviews
+- Phase 7: testing, security review, and deployment hardening
+
 | Check-In               | POST   | `/api/bookings/{id}/checkin/`       |
 | Check-Out              | POST   | `/api/bookings/{id}/checkout/`      |
 | Cancel Booking         | POST   | `/api/bookings/{id}/cancel/`        |

@@ -1,197 +1,51 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Hotel Booking System{% endblock %}</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .navbar-menu {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .navbar-menu a {
-            color: #333;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .navbar-menu a:hover {
-            color: #667eea;
-        }
-
-        .btn {
-            padding: 0.6rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-
-        .btn-secondary:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-
-        .container {
-            flex: 1;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            width: 100%;
-        }
-
-        .messages {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 1000;
-            max-width: 400px;
-        }
-
-        .alert {
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .alert-success {
-            background: #2ecc71;
-            color: white;
-        }
-
-        .alert-error {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .alert-info {
-            background: #3498db;
-            color: white;
-        }
-
-        footer {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 1.5rem;
-            text-align: center;
-            color: #666;
-            margin-top: auto;
-        }
-
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .navbar-menu {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar">
-        <a href="{% url 'home' %}" class="navbar-brand">🏨 Hotel Booking</a>
-        <div class="navbar-menu">
-            {% if user.is_authenticated %}
-                <a href="{% url 'dashboard' %}">Dashboard</a>
-                <a href="{% url 'rooms' %}">Rooms</a>
-                <a href="{% url 'my_bookings' %}">My Bookings</a>
-                <span style="color: #667eea;">👤 {{ user.username }}</span>
-                <form method="POST" action="{% url 'logout' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
-                <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
-            {% endif %}
-        </div>
-    </nav>
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="{% url 'home' %}" class="navbar-brand">
+                <span class="brand-mark">🏨</span>
+                Dhaka International Hotel
+            </a>
+            <div class="navbar-menu">
+                {% if user.is_authenticated %}
+                    {% if user.is_staff %}
+                        <a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Dashboard</a>
+                        <a href="{% url 'admin_rooms' %}" class="nav-link">Room Management</a>
+                    {% endif %}
+                    <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+                    <a href="{% url 'rooms' %}" class="nav-link">Rooms</a>
+                    <a href="{% url 'my_bookings' %}" class="nav-link">My Bookings</a>
+                    <a href="{% url 'home' %}#about" class="nav-link">About</a>
+                    <a href="{% url 'home' %}#faq" class="nav-link">FAQ</a>
+                    <a href="{% url 'home' %}#contact" class="nav-link">Contact</a>
+                    <span class="nav-user">👤 {{ user.username }}</span>
+                    <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'home' %}#about" class="nav-link">About</a>
+                    <a href="{% url 'home' %}#services" class="nav-link">Services</a>
+                    <a href="{% url 'home' %}#faq" class="nav-link">FAQ</a>
+                    <a href="{% url 'home' %}#contact" class="nav-link">Contact</a>
+                    <a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
 
     {% if messages %}
-    <div class="messages">
+    <div class="message-container">
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">
             {{ message }}
@@ -200,14 +54,18 @@
     </div>
     {% endif %}
 
-    <div class="container">
+    <main class="page-shell">
         {% block content %}{% endblock %}
-    </div>
+    </main>
 
-    <footer>
-        <p>&copy; 2025 Hotel Booking System. All rights reserved.</p>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span>© <span id="current-year">2026</span> Dhaka International Hotel</span>
+            <span>Luxury stays, seamless booking</span>
+        </div>
     </footer>
 
+    <script src="{% static 'js/main.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

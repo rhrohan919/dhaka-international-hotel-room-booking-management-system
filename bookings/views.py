@@ -288,7 +288,7 @@ class BookingCheckOutView(APIView):
         
         if extra_charges > 0:
             response_data['extra_charges'] = float(extra_charges)
-            response_data['message'] += f' (Extra charges: ₹{extra_charges})'
+            response_data['message'] += f' (Extra charges: ৳{extra_charges})'
         
         return Response(response_data, status=status.HTTP_200_OK)
 

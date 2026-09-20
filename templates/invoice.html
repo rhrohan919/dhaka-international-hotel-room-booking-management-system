@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice #{{ booking.id }} - Hotel Booking{% endblock %}
+
+{% block extra_css %}
+<style>
+    .invoice-shell {
+        max-width: 900px;
+        margin: 2rem auto;
+    }
+    .invoice-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(39, 52, 120, 0.12);
+        padding: 2rem;
+    }
+    .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #edf2f7;
+        margin-bottom: 1.5rem;
+    }
+    .brand h2 {
+        margin: 0;
+        color: #1e293b;
+        font-size: 2rem;
+    }
+    .brand p {
+        margin: 0.25rem 0 0 0;
+        color: #64748b;
+    }
+    .invoice-meta {
+        text-align: right;
+    }
+    .invoice-meta strong {
+        display: block;
+        color: #0f172a;
+        font-size: 1.2rem;
+    }
+    .invoice-meta span {
+        color: #64748b;
+    }
+    .invoice-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .invoice-section {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem 1.1rem;
+    }
+    .invoice-section h3 {
+        margin: 0 0 0.9rem 0;
+        color: #1e293b;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08rem;
+    }
+    .invoice-section p {
+        margin: 0.35rem 0;
+        color: #334155;
+    }
+    .totals {
+        border-top: 2px solid #edf2f7;
+        padding-top: 1.2rem;
+        margin-top: 1.5rem;
+    }
+    .totals-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.45rem 0;
+        color: #334155;
+        font-size: 1rem;
+    }
+    .totals-row.total {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+    .actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        border-radius: 10px;
+        padding: 0.85rem 1.2rem;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    .btn-secondary {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+    @media (max-width: 768px) {
+        .invoice-header { flex-direction: column; }
+        .invoice-meta { text-align: left; }
+        .invoice-card { padding: 1.2rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="invoice-shell">
+    <div class="invoice-card">
+        <div class="invoice-header">
+            <div class="brand">
+                <h2>Dhaka International Hotel</h2>
+                <p>Hotel Booking & Stay Invoice</p>
+            </div>
+            <div class="invoice-meta">
+                <strong>Invoice #{{ booking.id }}</strong>
+                <span>{{ booking.created_at|date:"M d, Y" }}</span>
+            </div>
+        </div>
+
+        <div class="invoice-grid">
+            <div class="invoice-section">
+                <h3>Guest Details</h3>
+                <p><strong>Name:</strong> {{ booking.guest_name }}</p>
+                <p><strong>Email:</strong> {{ booking.guest_email }}</p>
+                <p><strong>Phone:</strong> {{ booking.guest_phone }}</p>
+            </div>
+
+            <div class="invoice-section">
+                <h3>Booking Details</h3>
+                <p><strong>Room:</strong> {{ booking.room.room_number }} ({{ booking.room.get_room_type_display }})</p>
+                <p><strong>Check-in:</strong> {{ booking.start_time|date:"M d, Y" }} {{ booking.start_time|time:"h:i A" }}</p>
+                <p><strong>Check-out:</strong> {{ booking.end_time|date:"M d, Y" }} {{ booking.end_time|time:"h:i A" }}</p>
+            </div>
+        </div>
+
+        <div class="totals">
+            <div class="totals-row">
+                <span>Booking Type</span>
+                <span>{{ booking.get_booking_type_display }}</span>
+            </div>
+            <div class="totals-row">
+                <span>Room Rate</span>
+                {% if booking.booking_type == 'daily' %}
+                    <span>৳{{ booking.room.daily_rate }}</span>
+                {% else %}
+                    <span>৳{{ booking.room.hourly_rate }}</span>
+                {% endif %}
+            </div>
+            <div class="totals-row">
+                <span>Guests</span>
+                <span>{{ booking.number_of_guests }}</span>
+            </div>
+            <div class="totals-row total">
+                <span>Total Amount</span>
+                <span>৳{{ booking.total_price }}</span>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="{% url 'booking_detail' booking.id %}" class="btn btn-primary">Back to Booking</a>
+            <a href="{% url 'my_bookings' %}" class="btn btn-secondary">My Bookings</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

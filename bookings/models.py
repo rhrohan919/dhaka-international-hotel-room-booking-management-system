@@ -1,10 +1,21 @@
+import re
+
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from decimal import Decimal
+from django.core.mail import send_mail
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from rooms.models import Room
+
+BANGLADESHI_PHONE_PATTERN = r'^(?:\+?88|88)?01[3-9]\d{8}$'
+validate_bangladeshi_phone = RegexValidator(
+    regex=BANGLADESHI_PHONE_PATTERN,
+    message='Enter a valid Bangladeshi phone number (e.g. +88017XXXXXXXX or 017XXXXXXXX).'
+)
 
 
 class Booking(models.Model):
@@ -23,6 +34,7 @@ class Booking(models.Model):
         ('checked_in', 'Checked In'),
         ('checked_out', 'Checked Out'),
         ('cancelled', 'Cancelled'),
+        ('rejected', 'Rejected'),
         ('expired', 'Expired'),
     ]
 
@@ -52,7 +64,10 @@ class Booking(models.Model):
     # Guest information
     guest_name = models.CharField(max_length=100)
     guest_email = models.EmailField()
-    guest_phone = models.CharField(max_length=20)
+    guest_phone = models.CharField(
+        max_length=20,
+        validators=[validate_bangladeshi_phone]
+    )
     number_of_guests = models.PositiveIntegerField(
         validators=[MinValueValidator(1)]
     )
@@ -186,5 +201,102 @@ class Booking(models.Model):
     def is_past(self):
         """Check if booking is in the past"""
         return self.status in ['checked_out', 'cancelled', 'expired'] or self.end_time < timezone.now()
-    
+
+
+class Payment(models.Model):
+    """Payment record for a booking."""
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+        ('failed', 'Failed'),
+    ]
+
+    booking = models.OneToOneField(
+        Booking,
+        on_delete=models.CASCADE,
+        related_name='payment'
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(max_length=30, default='online')
+    status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='paid')
+    transaction_id = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Payment #{self.id} for Booking #{self.booking_id}"
+
+
+class Review(models.Model):
+    """Guest review for a room."""
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.PositiveSmallIntegerField(default=5)
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ('room', 'user')
+
+    def __str__(self):
+        return f"{self.user.username} rated Room {self.room.room_number}: {self.rating}/5"
+
+
+class ContactMessage(models.Model):
+    """Guest contact form submissions."""
+    name = models.CharField(max_length=120)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True)
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.name} - {self.subject}"
+
+
+@receiver(post_save, sender=Booking)
+def create_booking_payment_and_email(sender, instance, created, **kwargs):
+    """Create a payment record and send confirmation email when a booking is confirmed."""
+    if instance.status != 'confirmed':
+        return
+
+    payment, _ = Payment.objects.get_or_create(
+        booking=instance,
+        defaults={
+            'amount': instance.total_price,
+            'payment_method': 'online',
+            'status': 'paid',
+            'transaction_id': f"PK-{instance.id}-{timezone.now().strftime('%Y%m%d%H%M%S')}",
+        }
+    )
+
+    if payment.amount != instance.total_price:
+        payment.amount = instance.total_price
+        payment.save(update_fields=['amount', 'updated_at'])
+
+    if instance.guest_email:
+        send_mail(
+            subject=f'Dhaka International Hotel Booking Confirmed #{instance.id}',
+            message=(
+                f"Hello {instance.guest_name},\n\n"
+                f"Your booking at Dhaka International Hotel is confirmed.\n"
+                f"Room: {instance.room.room_number} ({instance.room.get_room_type_display()})\n"
+                f"Check-in: {instance.start_time.strftime('%Y-%m-%d %H:%M')}\n"
+                f"Check-out: {instance.end_time.strftime('%Y-%m-%d %H:%M')}\n"
+                f"Total: ৳{instance.total_price}\n\n"
+                f"Thank you for choosing Dhaka International Hotel."
+            ),
+            from_email='noreply@localhost',
+            recipient_list=[instance.guest_email],
+            fail_silently=True,
+        )
     

@@ -226,12 +226,12 @@
 
             <div class="filter-group">
                 <label>Max Hourly Rate</label>
-                <input type="number" name="max_hourly_rate" class="filter-control" placeholder="₹ per hour">
+                <input type="number" name="max_hourly_rate" class="filter-control" placeholder="৳ per hour">
             </div>
 
             <div class="filter-group">
                 <label>Max Daily Rate</label>
-                <input type="number" name="max_daily_rate" class="filter-control" placeholder="₹ per day">
+                <input type="number" name="max_daily_rate" class="filter-control" placeholder="৳ per day">
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Apply Filters</button>
@@ -271,11 +271,11 @@
             <div class="room-pricing">
                 <div class="price-item">
                     <div class="price-label">Hourly</div>
-                    <div class="price-value">₹{{ room.hourly_rate }}</div>
+                    <div class="price-value">৳{{ room.hourly_rate }}</div>
                 </div>
                 <div class="price-item">
                     <div class="price-label">Daily</div>
-                    <div class="price-value">₹{{ room.daily_rate }}</div>
+                    <div class="price-value">৳{{ room.daily_rate }}</div>
                 </div>
             </div>
 

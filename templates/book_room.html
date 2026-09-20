@@ -198,11 +198,11 @@
         <div class="pricing-info">
             <div class="price-box">
                 <div class="price-label">Hourly Rate</div>
-                <div class="price-value">₹{{ room.hourly_rate }}</div>
+                <div class="price-value">৳{{ room.hourly_rate }}</div>
             </div>
             <div class="price-box">
                 <div class="price-label">Daily Rate</div>
-                <div class="price-value">₹{{ room.daily_rate }}</div>
+                <div class="price-value">৳{{ room.daily_rate }}</div>
             </div>
         </div>
     </div>
@@ -256,7 +256,7 @@
                 <div class="form-group">
                     <label for="guest_phone">Phone Number *</label>
                     <input type="tel" name="guest_phone" id="guest_phone" 
-                           class="form-control" placeholder="+91XXXXXXXXXX" required>
+                           class="form-control" placeholder="+88017XXXXXXXX" pattern="^(?:\+?88|88)?01[3-9]\d{8}$" required>
                 </div>
 
                 <div class="form-group">
@@ -285,7 +285,7 @@
                 </div>
                 <div class="calculation-row total">
                     <span>Total Amount:</span>
-                    <span id="totalAmount">₹0</span>
+                    <span id="totalAmount">৳0</span>
                 </div>
             </div>
 
@@ -297,46 +297,55 @@
 </div>
 
 <script>
-    // const hourlyRate = {{ room.hourly_rate }};
-    // const dailyRate = {{ room.daily_rate }};
-    
-    document.getElementById('bookingForm').addEventListener('change', calculatePrice);
-    
+    const hourlyRate = Number('{{ room.hourly_rate|floatformat:"2" }}') || 0;
+    const dailyRate = Number('{{ room.daily_rate|floatformat:"2" }}') || 0;
+
+    const form = document.getElementById('bookingForm');
+    const priceCalculation = document.getElementById('priceCalculation');
+
+    form.addEventListener('change', calculatePrice);
+    form.addEventListener('input', calculatePrice);
+
     function calculatePrice() {
         const bookingType = document.getElementById('booking_type').value;
         const startTime = document.getElementById('start_time').value;
         const endTime = document.getElementById('end_time').value;
-        
-        if (bookingType && startTime && endTime) {
-            const start = new Date(startTime);
-            const end = new Date(endTime);
-            const hours = (end - start) / (1000 * 60 * 60);
-            
-            if (hours > 0) {
-                let totalPrice;
-                let durationText;
-                let rateText;
-                
-                if (bookingType === 'hourly') {
-                    totalPrice = hours * hourlyRate;
-                    durationText = hours.toFixed(1) + ' hours';
-                    rateText = '₹' + hourlyRate + ' per hour';
-                } else {
-                    const days = hours / 24;
-                    totalPrice = days * dailyRate;
-                    durationText = days.toFixed(1) + ' days';
-                    rateText = '₹' + dailyRate + ' per day';
-                }
-                
-                document.getElementById('duration').textContent = durationText;
-                document.getElementById('rate').textContent = rateText;
-                document.getElementById('totalAmount').textContent = '₹' + totalPrice.toFixed(2);
-                document.getElementById('priceCalculation').style.display = 'block';
-            }
+
+        if (!bookingType || !startTime || !endTime) {
+            priceCalculation.style.display = 'none';
+            return;
         }
+
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+        const hours = (end - start) / (1000 * 60 * 60);
+
+        if (!(hours > 0)) {
+            priceCalculation.style.display = 'none';
+            return;
+        }
+
+        let totalPrice;
+        let durationText;
+        let rateText;
+
+        if (bookingType === 'hourly') {
+            totalPrice = hours * hourlyRate;
+            durationText = hours.toFixed(1) + ' hours';
+            rateText = '৳' + hourlyRate.toFixed(2) + ' per hour';
+        } else {
+            const days = hours / 24;
+            totalPrice = days * dailyRate;
+            durationText = days.toFixed(1) + ' days';
+            rateText = '৳' + dailyRate.toFixed(2) + ' per day';
+        }
+
+        document.getElementById('duration').textContent = durationText;
+        document.getElementById('rate').textContent = rateText;
+        document.getElementById('totalAmount').textContent = '৳' + totalPrice.toFixed(2);
+        priceCalculation.style.display = 'block';
     }
-    
-    // Set minimum date to current date
+
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     document.getElementById('start_time').min = now.toISOString().slice(0, 16);

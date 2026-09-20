@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Room Management - Hotel Booking{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-shell { max-width: 1200px; margin: 0 auto; }
+    .admin-header {
+        background: white; border-radius: 18px; padding: 2rem; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        margin-bottom: 2rem;
+    }
+    .admin-header h1 { margin: 0 0 0.4rem 0; color: #0f172a; }
+    .admin-header p { margin: 0; color: #475569; }
+    .rooms-table-wrap { background: white; border-radius: 18px; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 1rem 1.1rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #0f172a; }
+    .room-status { display: inline-block; padding: 0.45rem 0.8rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+    .status-available { background: #dcfce7; color: #166534; }
+    .status-maintenance { background: #fef3c7; color: #92400e; }
+    .status-inactive { background: #e2e8f0; color: #334155; }
+    .status-form { display: flex; gap: 0.75rem; align-items: center; }
+    .status-form select {
+        padding: 0.6rem 0.75rem; border-radius: 10px; border: 1px solid #cbd5e1; background: white; color: #0f172a;
+    }
+    .btn {
+        border: none; border-radius: 10px; padding: 0.7rem 1rem; font-weight: 700; cursor: pointer; text-decoration: none;
+    }
+    .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-shell">
+    <div class="admin-header">
+        <h1>🏠 Room Management</h1>
+        <p>Update room availability and maintenance status in one place.</p>
+    </div>
+
+    <div class="rooms-table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Room</th>
+                    <th>Type</th>
+                    <th>Capacity</th>
+                    <th>Daily Rate</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                <tr>
+                    <td>Room {{ room.room_number }}</td>
+                    <td>{{ room.get_room_type_display }}</td>
+                    <td>{{ room.capacity }} guests</td>
+                    <td>৳{{ room.daily_rate }}</td>
+                    <td><span class="room-status status-{{ room.status }}">{{ room.get_status_display }}</span></td>
+                    <td>
+                        <form method="POST" class="status-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="room_id" value="{{ room.id }}">
+                            <select name="status">
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if room.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">No rooms found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
